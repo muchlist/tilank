@@ -2,7 +2,7 @@ package service
 
 import (
 	"net/http"
-	userdao "tilank/dao/user_dao"
+	userdao "tilank/dao/userdao"
 	"tilank/dto"
 	"tilank/utils/crypt"
 	"tilank/utils/mjwt"

@@ -16,7 +16,6 @@ type Violation struct {
 	ApprovedByID string             `json:"approved_by_id" bson:"approved_by_id"`
 	Branch       string             `json:"branch" bson:"branch"`
 	Disable      bool               `json:"disable" bson:"disable"`
-
 	// State 0 Draft, 1 Need Approve, 2 Approved, 3 sendToJPT
 	State           int      `json:"state" bson:"state"`
 	NoIdentity      string   `json:"no_identity" bson:"no_identity"`
@@ -93,8 +92,8 @@ type ViolationEditRequest struct {
 type ViolationResponseMinList []ViolationResponseMin
 
 type ViolationResponseMin struct {
-	ID       primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
-	Branch   string             `json:"branch" bson:"branch"`
+	ID     primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	Branch string             `json:"branch" bson:"branch"`
 	// State 0 Draft, 1 Need Approve, 2 Approved, 3 sendToJPT
 	State           int      `json:"state" bson:"state"`
 	NoIdentity      string   `json:"no_identity" bson:"no_identity"`

@@ -1,7 +1,7 @@
 package app
 
 import (
-	"tilank/dao/user_dao"
+	"tilank/dao/userdao"
 	"tilank/handler"
 	"tilank/service"
 	"tilank/utils/crypt"
