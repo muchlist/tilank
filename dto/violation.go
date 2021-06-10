@@ -58,7 +58,6 @@ type ViolationEdit struct {
 	ApprovedBy   string
 	ApprovedByID string
 
-	State           int
 	NoIdentity      string
 	NoPol           string
 	Mark            string
@@ -68,13 +67,11 @@ type ViolationEdit struct {
 	DetailViolation string
 	TimeViolation   int64
 	Location        string
-	Images          []string
 }
 
 type ViolationConfirm struct {
-	ID              primitive.ObjectID
-	FilterBranch    string
-	FilterTimestamp int64
+	ID           primitive.ObjectID
+	FilterBranch string
 
 	UpdatedAt   int64
 	UpdatedBy   string
@@ -92,16 +89,15 @@ type ViolationEditRequest struct {
 	FilterTimestamp int64 `json:"filter_timestamp"`
 
 	// State 0 Draft, 1 Need Approve, 2 Approved, 3 sendToJPT
-	State           int      `json:"state" bson:"state"`
-	NoIdentity      string   `json:"no_identity" bson:"no_identity"`
-	NoPol           string   `json:"no_pol" bson:"no_pol"`
-	Mark            string   `json:"mark" bson:"mark"`
-	OwnerID         string   `json:"owner_id" bson:"owner_id"`
-	TypeViolation   string   `json:"type_violation" bson:"type_violation"`
-	DetailViolation string   `json:"detail_violation" bson:"detail_violation"`
-	TimeViolation   int64    `json:"time_violation" bson:"time_violation"`
-	Location        string   `json:"location" bson:"location"`
-	Images          []string `json:"images" bson:"images"`
+	State           int    `json:"state" bson:"state"`
+	NoIdentity      string `json:"no_identity" bson:"no_identity"`
+	NoPol           string `json:"no_pol" bson:"no_pol"`
+	Mark            string `json:"mark" bson:"mark"`
+	OwnerID         string `json:"owner_id" bson:"owner_id"`
+	TypeViolation   string `json:"type_violation" bson:"type_violation"`
+	DetailViolation string `json:"detail_violation" bson:"detail_violation"`
+	TimeViolation   int64  `json:"time_violation" bson:"time_violation"`
+	Location        string `json:"location" bson:"location"`
 }
 
 type ViolationResponseMinList []ViolationResponseMin

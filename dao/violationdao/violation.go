@@ -51,7 +51,7 @@ type violationDao struct {
 type ViolationDaoAssumer interface {
 	InsertViolation(input dto.Violation) (*string, resterr.APIError)
 	EditViolation(input dto.ViolationEdit) (*dto.Violation, resterr.APIError)
-	DeleteViolation(input dto.FilterIDBranchCreateGte) (*dto.Violation, resterr.APIError)
+	DeleteViolation(input dto.FilterIDBranch) (*dto.Violation, resterr.APIError)
 	UploadImage(violationID primitive.ObjectID, imagePath string, filterBranch string) (*dto.Violation, resterr.APIError)
 	DeleteImage(violationID primitive.ObjectID, imagePath string, filterBranch string) (*dto.Violation, resterr.APIError)
 	ConfirmViolation(input dto.ViolationConfirm) (*dto.Violation, resterr.APIError)
@@ -91,9 +91,6 @@ func (c *violationDao) EditViolation(input dto.ViolationEdit) (*dto.Violation, r
 
 	input.NoIdentity = strings.ToUpper(input.NoIdentity)
 	input.NoPol = strings.ToUpper(input.NoPol)
-	if input.Images == nil {
-		input.Images = []string{}
-	}
 
 	opts := options.FindOneAndUpdate()
 	opts.SetReturnDocument(1)
@@ -119,7 +116,6 @@ func (c *violationDao) EditViolation(input dto.ViolationEdit) (*dto.Violation, r
 			keyViolDetailViolation: input.DetailViolation,
 			keyViolTimeViolation:   input.TimeViolation,
 			keyViolLocation:        input.Location,
-			keyViolImages:          input.Images,
 		},
 	}
 
@@ -179,7 +175,7 @@ func (c *violationDao) ConfirmViolation(input dto.ViolationConfirm) (*dto.Violat
 	return &violation, nil
 }
 
-func (c *violationDao) DeleteViolation(input dto.FilterIDBranchCreateGte) (*dto.Violation, resterr.APIError) {
+func (c *violationDao) DeleteViolation(input dto.FilterIDBranch) (*dto.Violation, resterr.APIError) {
 	coll := db.DB.Collection(keyViolCollection)
 	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
 	defer cancel()
@@ -276,7 +272,6 @@ func (c *violationDao) DeleteImage(violationID primitive.ObjectID, imagePath str
 		},
 	}
 
-	//var violation dto.Violation
 	if err := coll.FindOneAndUpdate(ctx, filter, update, opts).Decode(&violation); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, resterr.NewBadRequestError(fmt.Sprintf("Memasukkan path image gagal, violation dengan id %s tidak ditemukan", violationID.Hex()))
