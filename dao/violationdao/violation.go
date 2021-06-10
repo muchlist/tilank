@@ -21,9 +21,6 @@ const (
 	keyViolCollection = "violation"
 
 	keyViolID              = "_id"
-	keyViolCreatedAt       = "created_at"
-	keyViolCreatedBy       = "created_by"
-	keyViolCreatedByID     = "created_by_id"
 	keyViolUpdatedAt       = "updated_at"
 	keyViolUpdatedBy       = "updated_by"
 	keyViolUpdatedByID     = "updated_by_id"
@@ -31,7 +28,6 @@ const (
 	keyViolApprovedBy      = "approved_by"
 	keyViolApprovedByID    = "approved_by_id"
 	keyViolBranch          = "branch"
-	keyViolDisable         = "disable"
 	keyViolState           = "state"
 	keyViolNoIdentity      = "no_identity"
 	keyViolNoPol           = "no_pol"
@@ -58,8 +54,7 @@ type ViolationDaoAssumer interface {
 	DeleteViolation(input dto.FilterIDBranchCreateGte) (*dto.Violation, resterr.APIError)
 	UploadImage(violationID primitive.ObjectID, imagePath string, filterBranch string) (*dto.Violation, resterr.APIError)
 	DeleteImage(violationID primitive.ObjectID, imagePath string, filterBranch string) (*dto.Violation, resterr.APIError)
-
-	// todo confirm violation
+	ConfirmViolation(input dto.ViolationConfirm) (*dto.Violation, resterr.APIError)
 
 	GetViolationByID(violationID primitive.ObjectID, branchIfSpecific string) (*dto.Violation, resterr.APIError)
 	FindViolation(filter dto.FilterViolation) (dto.ViolationResponseMinList, resterr.APIError)
@@ -76,7 +71,6 @@ func (c *violationDao) InsertViolation(input dto.Violation) (*string, resterr.AP
 	if input.Images == nil {
 		input.Images = []string{}
 	}
-	input.Disable = false
 
 	result, err := coll.InsertOne(ctx, input)
 	if err != nil {
@@ -126,6 +120,48 @@ func (c *violationDao) EditViolation(input dto.ViolationEdit) (*dto.Violation, r
 			keyViolTimeViolation:   input.TimeViolation,
 			keyViolLocation:        input.Location,
 			keyViolImages:          input.Images,
+		},
+	}
+
+	var violation dto.Violation
+	if err := coll.FindOneAndUpdate(ctx, filter, update, opts).Decode(&violation); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, resterr.NewBadRequestError("pelanggaran tidak diupdate : validasi id timestamp")
+		}
+
+		logger.Error("Gagal mendapatkan violation dari database (EditViolation)", err)
+		apiErr := resterr.NewInternalServerError("Gagal mendapatkan violation dari database", err)
+		return nil, apiErr
+	}
+
+	return &violation, nil
+}
+
+func (c *violationDao) ConfirmViolation(input dto.ViolationConfirm) (*dto.Violation, resterr.APIError) {
+	coll := db.DB.Collection(keyViolCollection)
+	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
+	defer cancel()
+
+	opts := options.FindOneAndUpdate()
+	opts.SetReturnDocument(1)
+
+	filter := bson.M{
+		keyViolID:        input.ID,
+		keyViolBranch:    input.FilterBranch,
+		keyViolUpdatedAt: input.FilterTimestamp,
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			keyViolUpdatedAt:   input.UpdatedAt,
+			keyViolUpdatedBy:   input.UpdatedBy,
+			keyViolUpdatedByID: input.UpdatedByID,
+
+			keyViolApprovedAt:   input.ApprovedAt,
+			keyViolApprovedBy:   input.ApprovedBy,
+			keyViolApprovedByID: input.ApprovedByID,
+
+			keyViolState: input.State,
 		},
 	}
 

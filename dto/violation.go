@@ -15,7 +15,6 @@ type Violation struct {
 	ApprovedBy   string             `json:"approved_by" bson:"approved_by"`
 	ApprovedByID string             `json:"approved_by_id" bson:"approved_by_id"`
 	Branch       string             `json:"branch" bson:"branch"`
-	Disable      bool               `json:"disable" bson:"disable"`
 	// State 0 Draft, 1 Need Approve, 2 Approved, 3 sendToJPT
 	State           int      `json:"state" bson:"state"`
 	NoIdentity      string   `json:"no_identity" bson:"no_identity"`
@@ -70,6 +69,22 @@ type ViolationEdit struct {
 	TimeViolation   int64
 	Location        string
 	Images          []string
+}
+
+type ViolationConfirm struct {
+	ID              primitive.ObjectID
+	FilterBranch    string
+	FilterTimestamp int64
+
+	UpdatedAt   int64
+	UpdatedBy   string
+	UpdatedByID string
+
+	ApprovedAt   int64
+	ApprovedBy   string
+	ApprovedByID string
+
+	State int
 }
 
 // ViolationEditRequest user input
