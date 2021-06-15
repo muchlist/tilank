@@ -142,9 +142,8 @@ func (c *violationDao) ConfirmViolation(input dto.ViolationConfirm) (*dto.Violat
 	opts.SetReturnDocument(1)
 
 	filter := bson.M{
-		keyViolID:        input.ID,
-		keyViolBranch:    input.FilterBranch,
-		keyViolUpdatedAt: input.FilterTimestamp,
+		keyViolID:     input.ID,
+		keyViolBranch: input.FilterBranch,
 	}
 
 	update := bson.M{
