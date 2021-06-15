@@ -11,6 +11,7 @@ import (
 	"strings"
 	"tilank/db"
 	"tilank/dto"
+	"tilank/enum"
 	"tilank/utils/logger"
 	"tilank/utils/rest_err"
 	"time"
@@ -54,7 +55,7 @@ type ViolationDaoAssumer interface {
 	DeleteViolation(input dto.FilterIDBranch) (*dto.Violation, resterr.APIError)
 	UploadImage(violationID primitive.ObjectID, imagePath string, filterBranch string) (*dto.Violation, resterr.APIError)
 	DeleteImage(violationID primitive.ObjectID, imagePath string, filterBranch string) (*dto.Violation, resterr.APIError)
-	ConfirmViolation(input dto.ViolationConfirm) (*dto.Violation, resterr.APIError)
+	ChangeStateViolation(input dto.ViolationConfirm) (*dto.Violation, resterr.APIError)
 
 	GetViolationByID(violationID primitive.ObjectID, branchIfSpecific string) (*dto.Violation, resterr.APIError)
 	FindViolation(filter dto.FilterViolation) (dto.ViolationResponseMinList, resterr.APIError)
@@ -133,7 +134,7 @@ func (c *violationDao) EditViolation(input dto.ViolationEdit) (*dto.Violation, r
 	return &violation, nil
 }
 
-func (c *violationDao) ConfirmViolation(input dto.ViolationConfirm) (*dto.Violation, resterr.APIError) {
+func (c *violationDao) ChangeStateViolation(input dto.ViolationConfirm) (*dto.Violation, resterr.APIError) {
 	coll := db.DB.Collection(keyViolCollection)
 	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
 	defer cancel()
@@ -182,7 +183,7 @@ func (c *violationDao) DeleteViolation(input dto.FilterIDBranch) (*dto.Violation
 	filter := bson.M{
 		keyViolID:     input.FilterID,
 		keyViolBranch: input.FilterBranch,
-		keyViolState:  bson.M{"$lte": 1}, // yang dapat diedit 0 draft dan 1 need approved
+		keyViolState:  bson.M{"$lte": enum.StNeedApprove.EnumIndex()}, // yang dapat diedit 0 draft dan 1 need approved
 	}
 
 	var violation dto.Violation
@@ -335,7 +336,7 @@ func (c *violationDao) FindViolation(filterA dto.FilterViolation) (dto.Violation
 			"$regex": fmt.Sprintf(".*%s", filterA.FilterNoPol),
 		}
 	}
-	if filterA.FilterState != -1 {
+	if filterA.FilterState != enum.StUndefined {
 		filter[keyViolState] = filterA.FilterState
 	}
 	if filterA.FilterStart != 0 && filterA.FilterEnd != 0 {

@@ -9,17 +9,17 @@ import (
 	"time"
 )
 
-func NewJptService(jptDao jptdao.JptDaoAssumer) *jptService {
-	return &jptService{
+func NewJptService(jptDao jptdao.JptDaoAssumer) *JptService {
+	return &JptService{
 		daoC: jptDao,
 	}
 }
 
-type jptService struct {
+type JptService struct {
 	daoC jptdao.JptDaoAssumer
 }
 
-func (j *jptService) InsertJpt(user mjwt.CustomClaim, input dto.JptRequest) (*string, resterr.APIError) {
+func (j *JptService) InsertJpt(user mjwt.CustomClaim, input dto.JptRequest) (*string, resterr.APIError) {
 	idGenerated := primitive.NewObjectID()
 
 	// Filling data
@@ -50,7 +50,7 @@ func (j *jptService) InsertJpt(user mjwt.CustomClaim, input dto.JptRequest) (*st
 	return insertedID, nil
 }
 
-func (j *jptService) EditJpt(user mjwt.CustomClaim, jptID string, input dto.JptEditRequest) (*dto.Jpt, resterr.APIError) {
+func (j *JptService) EditJpt(user mjwt.CustomClaim, jptID string, input dto.JptEditRequest) (*dto.Jpt, resterr.APIError) {
 	oid, errT := primitive.ObjectIDFromHex(jptID)
 	if errT != nil {
 		return nil, resterr.NewBadRequestError("ObjectID yang dimasukkan salah")
@@ -80,7 +80,7 @@ func (j *jptService) EditJpt(user mjwt.CustomClaim, jptID string, input dto.JptE
 	return jptEdited, nil
 }
 
-func (j *jptService) DeleteJpt(user mjwt.CustomClaim, id string) resterr.APIError {
+func (j *JptService) DeleteJpt(user mjwt.CustomClaim, id string) resterr.APIError {
 	oid, errT := primitive.ObjectIDFromHex(id)
 	if errT != nil {
 		return resterr.NewBadRequestError("ObjectID yang dimasukkan salah")
@@ -97,7 +97,7 @@ func (j *jptService) DeleteJpt(user mjwt.CustomClaim, id string) resterr.APIErro
 	return nil
 }
 
-func (j *jptService) ActivateJpt(user mjwt.CustomClaim, id string) resterr.APIError {
+func (j *JptService) ActivateJpt(user mjwt.CustomClaim, id string) resterr.APIError {
 	oid, errT := primitive.ObjectIDFromHex(id)
 	if errT != nil {
 		return resterr.NewBadRequestError("ObjectID yang dimasukkan salah")
@@ -114,7 +114,7 @@ func (j *jptService) ActivateJpt(user mjwt.CustomClaim, id string) resterr.APIEr
 	return nil
 }
 
-func (j *jptService) GetJptByID(jptID string, branchIfSpecific string) (*dto.Jpt, resterr.APIError) {
+func (j *JptService) GetJptByID(jptID string, branchIfSpecific string) (*dto.Jpt, resterr.APIError) {
 	oid, errT := primitive.ObjectIDFromHex(jptID)
 	if errT != nil {
 		return nil, resterr.NewBadRequestError("ObjectID yang dimasukkan salah")
@@ -128,7 +128,7 @@ func (j *jptService) GetJptByID(jptID string, branchIfSpecific string) (*dto.Jpt
 	return jpt, nil
 }
 
-func (j *jptService) FindJpt(filter dto.FilterJpt) (dto.JptResponseMinList, resterr.APIError) {
+func (j *JptService) FindJpt(filter dto.FilterJpt) (dto.JptResponseMinList, resterr.APIError) {
 
 	jptList, err := j.daoC.FindJpt(filter)
 	if err != nil {

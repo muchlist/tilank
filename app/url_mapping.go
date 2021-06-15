@@ -38,4 +38,16 @@ func mapUrls(app *fiber.App) {
 	apiAuthAdmin.Put("/users/:user_id", userHandler.Edit)
 	apiAuthAdmin.Delete("/users/:user_id", userHandler.Delete)
 	apiAuthAdmin.Get("/users/:user_id/reset-password", userHandler.ResetPassword)
+
+	// VIOLATION
+	api.Post("/violation", middleware.NormalAuth(), violationHandler.Insert)
+	api.Get("/violation/:id", middleware.NormalAuth(), violationHandler.Get)
+	api.Put("/violation/:id", middleware.NormalAuth(), violationHandler.Edit)
+	api.Get("/violation-draft/:id", middleware.NormalAuth(), violationHandler.SendToDraft)
+	api.Get("/violation-confirm/:id", middleware.NormalAuth(), violationHandler.SendToConfirmation)
+	api.Get("/violation-approve/:id", middleware.NormalAuth(), violationHandler.SendToApproved)
+	api.Delete("/violation/:id", middleware.NormalAuth(), violationHandler.Delete)
+	api.Get("/violation", middleware.NormalAuth(), violationHandler.Find)
+	api.Post("/violation-upload-image/:id", middleware.NormalAuth(), violationHandler.UploadImage)
+	api.Post("/violation-delete-image/:id", middleware.NormalAuth(), violationHandler.DeleteImage)
 }
