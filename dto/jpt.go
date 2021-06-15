@@ -15,6 +15,7 @@ type Jpt struct {
 	Branch    string `json:"branch" bson:"branch"`
 	Name      string `json:"name" bson:"name"`
 	OwnerName string `json:"owner_name" bson:"owner_name"`
+	IDPelindo string `json:"id_pelindo" bson:"id_pelindo"`
 	Hp        string `json:"hp" bson:"hp"`
 	Email     string `json:"email" bson:"email"`
 	Deleted   bool   `json:"deleted" bson:"deleted"`
@@ -26,6 +27,7 @@ type JptRequest struct {
 
 	Name      string `json:"name" bson:"name"`
 	OwnerName string `json:"owner_name" bson:"owner_name"`
+	IDPelindo string `json:"id_pelindo" bson:"id_pelindo"`
 	Hp        string `json:"hp" bson:"hp"`
 	Email     string `json:"email" bson:"email"`
 }
@@ -41,6 +43,7 @@ type JptEdit struct {
 
 	Name      string
 	OwnerName string
+	IDPelindo string
 	Hp        string
 	Email     string
 }
@@ -51,6 +54,7 @@ type JptEditRequest struct {
 
 	Name      string `json:"name" bson:"name"`
 	OwnerName string `json:"owner_name" bson:"owner_name"`
+	IDPelindo string `json:"id_pelindo" bson:"id_pelindo"`
 	Hp        string `json:"hp" bson:"hp"`
 	Email     string `json:"email" bson:"email"`
 }
@@ -63,6 +67,7 @@ type JptResponseMin struct {
 
 	Name      string `json:"name" bson:"name"`
 	OwnerName string `json:"owner_name" bson:"owner_name"`
+	IDPelindo string `json:"id_pelindo" bson:"id_pelindo"`
 	Hp        string `json:"hp" bson:"hp"`
 	Email     string `json:"email" bson:"email"`
 	Deleted   bool   `json:"deleted" bson:"deleted"`

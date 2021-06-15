@@ -27,6 +27,7 @@ const (
 	keyJptBranch      = "branch"
 	keyJptName        = "name"
 	keyJptOwnerName   = "owner_name"
+	keyJptIDPelindo   = "id_pelindo"
 	keyJptHp          = "hp"
 	keyJptEmail       = "email"
 	keyJptDeleted     = "deleted"
@@ -42,6 +43,7 @@ type jptDao struct {
 type JptDaoAssumer interface {
 	InsertJpt(input dto.Jpt) (*string, resterr.APIError)
 	EditJpt(input dto.JptEdit) (*dto.Jpt, resterr.APIError)
+	DeleteJpt(input dto.FilterIDBranch, isSoftDelete bool) (*dto.Jpt, resterr.APIError)
 
 	GetJptByID(jptID primitive.ObjectID, branchIfSpecific string) (*dto.Jpt, resterr.APIError)
 	FindJpt(filter dto.FilterJpt) (dto.JptResponseMinList, resterr.APIError)
@@ -92,6 +94,7 @@ func (c *jptDao) EditJpt(input dto.JptEdit) (*dto.Jpt, resterr.APIError) {
 			keyJptUpdatedByID: input.UpdatedByID,
 			keyJptName:        input.Name,
 			keyJptOwnerName:   input.OwnerName,
+			keyJptIDPelindo:   input.IDPelindo,
 			keyJptHp:          input.Hp,
 			keyJptEmail:       input.Email,
 		},
