@@ -17,6 +17,7 @@ func mapUrls(app *fiber.App) {
 	app.Use(middleware.LimitRequest())
 
 	app.Static("/image/avatar", "./static/image/avatar")
+	app.Static("/image/avatar", "./static/image/violation")
 
 	api := app.Group("/api/v1")
 
@@ -47,14 +48,16 @@ func mapUrls(app *fiber.App) {
 	api.Get("/violation-confirm/:id", middleware.NormalAuth(), violationHandler.SendToConfirmation)
 	api.Get("/violation-approve/:id", middleware.NormalAuth(config.RoleHSSE), violationHandler.SendToApproved)
 	api.Delete("/violation/:id", middleware.NormalAuth(), violationHandler.Delete)
+	// Query [branch, lambung, nopol, state, limit, start, end]
 	api.Get("/violation", middleware.NormalAuth(), violationHandler.Find)
 	api.Post("/violation-upload-image/:id", middleware.NormalAuth(), violationHandler.UploadImage)
-	api.Post("/violation-delete-image/:id", middleware.NormalAuth(), violationHandler.DeleteImage)
+	api.Get("/violation-delete-image/:id/:image", middleware.NormalAuth(), violationHandler.DeleteImage)
 
 	// JPT
 	api.Post("/jpt", middleware.NormalAuth(config.RoleHSSE), jptHandler.Insert)
-	api.Get("/jpt/:id", middleware.NormalAuth(config.RoleHSSE), jptHandler.Get)
+	api.Get("/jpt/:id", middleware.NormalAuth(), jptHandler.Get)
 	api.Put("/jpt/:id", middleware.NormalAuth(config.RoleHSSE), jptHandler.Edit)
 	api.Delete("/jpt/:id", middleware.NormalAuth(config.RoleHSSE), jptHandler.Delete)
-	api.Get("/jpt", middleware.NormalAuth(config.RoleHSSE), jptHandler.Find)
+	// Query [branch, name, active ]
+	api.Get("/jpt", middleware.NormalAuth(), jptHandler.Find)
 }

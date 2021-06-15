@@ -43,8 +43,8 @@ func (v *ViolationService) InsertViolation(user mjwt.CustomClaim, input dto.Viol
 	// validasi inputan state,
 	state := input.State
 	// jika bukan 0 draft atau 1 perlu persetujuan set ke draft
-	if !(state == enum.StUndefined || state == enum.StNeedApprove) {
-		state = enum.StUndefined
+	if !(state == enum.StDraft || state == enum.StNeedApprove) {
+		state = enum.StDraft
 	}
 
 	// mendapatkan nama jpt
@@ -185,7 +185,7 @@ func (v *ViolationService) SendToConfirmationViolation(user mjwt.CustomClaim, vi
 	}
 
 	// validasi
-	if violation.State != enum.StDraft {
+	if !(violation.State == enum.StDraft || violation.State == enum.StUndefined) {
 		apiErr := resterr.NewBadRequestError("status dokumen tidak dapat diubah ke NeedConfirm")
 		return nil, apiErr
 	}

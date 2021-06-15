@@ -150,13 +150,16 @@ func (vh *violationHandler) UploadImage(c *fiber.Ctx) error {
 func (vh *violationHandler) DeleteImage(c *fiber.Ctx) error {
 	claims := c.Locals(mjwt.CLAIMS).(*mjwt.CustomClaim)
 	id := c.Params("id")
-	pathImage := c.Params("image")
+	pathImage := fmt.Sprintf("image/violation/%s", c.Params("image"))
 
 	// cek apakah ID violation && branch ada
 	violation, apiErr := vh.service.GetViolationByID(id, claims.Branch)
 	if apiErr != nil {
 		return c.Status(apiErr.Status()).JSON(fiber.Map{"error": apiErr, "data": nil})
 	}
+
+	fmt.Printf("di db : %s \n", violation.Images)
+	fmt.Printf("di input : %s", pathImage)
 
 	// untuk sementara gambar tidak dihapus dari system
 	imageExist := sfunc.InSlice(pathImage, violation.Images)

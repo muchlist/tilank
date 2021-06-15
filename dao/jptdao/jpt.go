@@ -182,7 +182,9 @@ func (c *jptDao) FindJpt(filterA dto.FilterJpt) (dto.JptResponseMinList, resterr
 	filterA.FilterName = strings.ToUpper(filterA.FilterName)
 
 	// filter
-	filter := bson.M{}
+	filter := bson.M{
+		keyJptDeleted: !filterA.Active,
+	}
 
 	// filter condition
 	if filterA.FilterBranch != "" {

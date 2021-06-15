@@ -97,7 +97,7 @@ func (vj *jptHandler) Get(c *fiber.Ctx) error {
 }
 
 // Find menampilkan list jpt
-// Query [branch, lambung, nopol, state, limit, start, end]
+// Query [branch, name, active ]
 func (vj *jptHandler) Find(c *fiber.Ctx) error {
 	branch := strings.ToUpper(c.Query("branch"))
 	name := strings.ToUpper(c.Query("name"))
