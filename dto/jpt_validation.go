@@ -11,7 +11,6 @@ func (c JptRequest) Validate() error {
 		validation.Field(&c.OwnerName, validation.Required),
 		validation.Field(&c.Hp, validation.Required),
 		validation.Field(&c.Email, validation.Required, is.Email),
-		validation.Field(&c.Branch, validation.Required),
 	); err != nil {
 		return err
 	}

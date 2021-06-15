@@ -45,9 +45,16 @@ func mapUrls(app *fiber.App) {
 	api.Put("/violation/:id", middleware.NormalAuth(), violationHandler.Edit)
 	api.Get("/violation-draft/:id", middleware.NormalAuth(), violationHandler.SendToDraft)
 	api.Get("/violation-confirm/:id", middleware.NormalAuth(), violationHandler.SendToConfirmation)
-	api.Get("/violation-approve/:id", middleware.NormalAuth(), violationHandler.SendToApproved)
+	api.Get("/violation-approve/:id", middleware.NormalAuth(config.RoleHSSE), violationHandler.SendToApproved)
 	api.Delete("/violation/:id", middleware.NormalAuth(), violationHandler.Delete)
 	api.Get("/violation", middleware.NormalAuth(), violationHandler.Find)
 	api.Post("/violation-upload-image/:id", middleware.NormalAuth(), violationHandler.UploadImage)
 	api.Post("/violation-delete-image/:id", middleware.NormalAuth(), violationHandler.DeleteImage)
+
+	// JPT
+	api.Post("/jpt", middleware.NormalAuth(config.RoleHSSE), jptHandler.Insert)
+	api.Get("/jpt/:id", middleware.NormalAuth(config.RoleHSSE), jptHandler.Get)
+	api.Put("/jpt/:id", middleware.NormalAuth(config.RoleHSSE), jptHandler.Edit)
+	api.Delete("/jpt/:id", middleware.NormalAuth(config.RoleHSSE), jptHandler.Delete)
+	api.Get("/jpt", middleware.NormalAuth(config.RoleHSSE), jptHandler.Find)
 }

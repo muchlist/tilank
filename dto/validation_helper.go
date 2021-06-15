@@ -18,7 +18,7 @@ func roleValidation(rolesIn []string) error {
 func typeViolationValidation(typeViolation string) error {
 
 	if !sfunc.InSlice(typeViolation, config.GetTypeAvailable()) {
-		return fmt.Errorf("tile yang dimasukkan tidak tersedia. gunakan %s", config.GetTypeAvailable())
+		return fmt.Errorf("tipe yang dimasukkan tidak tersedia. gunakan %s", config.GetTypeAvailable())
 	}
 
 	return nil

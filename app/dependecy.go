@@ -29,4 +29,5 @@ var (
 	pingHandler      = handler.NewPingHandler()
 	userHandler      = handler.NewUserHandler(userService)
 	violationHandler = handler.NewViolationHandler(violationService)
+	jptHandler       = handler.NewJptHandler(jptService)
 )

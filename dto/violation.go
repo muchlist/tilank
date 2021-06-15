@@ -45,7 +45,6 @@ type ViolationRequest struct {
 	DetailViolation string     `json:"detail_violation" bson:"detail_violation"`
 	TimeViolation   int64      `json:"time_violation" bson:"time_violation"`
 	Location        string     `json:"location" bson:"location"`
-	Images          []string   `json:"images" bson:"images"`
 }
 
 type ViolationEdit struct {
