@@ -6,7 +6,9 @@ import (
 	"tilank/dao/violationdao"
 	"tilank/dto"
 	"tilank/enum"
+	"tilank/utils/logger"
 	"tilank/utils/mjwt"
+	"tilank/utils/pdfgen"
 	"tilank/utils/rest_err"
 	"time"
 )
@@ -328,4 +330,23 @@ func (v *ViolationService) FindViolation(filter dto.FilterViolation) (dto.Violat
 	}
 
 	return violationList, nil
+}
+
+func (v *ViolationService) GeneratePDFViolation(violationID string) (*dto.Violation, resterr.APIError) {
+	oid, errT := primitive.ObjectIDFromHex(violationID)
+	if errT != nil {
+		return nil, resterr.NewBadRequestError("ObjectID yang dimasukkan salah")
+	}
+
+	violation, err := v.vDao.GetViolationByID(oid, "")
+	if err != nil {
+		return nil, err
+	}
+
+	errPdf := pdfgen.GeneratePDF(violation)
+	if errPdf != nil {
+		logger.Error("membuat pdf gagal", errPdf)
+	}
+
+	return violation, nil
 }

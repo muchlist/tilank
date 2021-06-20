@@ -221,3 +221,15 @@ func (vh *violationHandler) Find(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"error": nil, "data": violationList})
 }
+
+// GeneratePDF membuat pdf
+func (vh *violationHandler) GeneratePDF(c *fiber.Ctx) error {
+	violationID := c.Params("id")
+
+	violation, apiErr := vh.service.GeneratePDFViolation(violationID)
+	if apiErr != nil {
+		return c.Status(apiErr.Status()).JSON(fiber.Map{"error": apiErr, "data": nil})
+	}
+
+	return c.JSON(fiber.Map{"error": nil, "data": violation})
+}

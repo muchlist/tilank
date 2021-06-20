@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 	"tilank/db"
+	"tilank/utils/logger"
 )
 
 func RunApp() {
@@ -21,7 +21,7 @@ func RunApp() {
 	app := fiber.New()
 	mapUrls(app)
 	if err := app.Listen(":3500"); err != nil {
-		log.Print(err)
+		logger.Error("error fiber listen", err)
 		return
 	}
 }
