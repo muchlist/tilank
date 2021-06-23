@@ -136,7 +136,6 @@ func (j *TruckService) GetTruckByID(truckID string, branchIfSpecific string) (*d
 }
 
 func (j *TruckService) FindTruck(filter dto.FilterTruck) (dto.TruckResponseMinList, resterr.APIError) {
-
 	truckList, err := j.daoC.FindTruck(filter)
 	if err != nil {
 		return nil, err

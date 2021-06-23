@@ -7,7 +7,6 @@ import (
 func (c ViolationRequest) Validate() error {
 	if err := validation.ValidateStruct(&c,
 		validation.Field(&c.NoIdentity, validation.Required),
-		validation.Field(&c.OwnerID, validation.Required),
 		validation.Field(&c.TypeViolation, validation.Required),
 		validation.Field(&c.DetailViolation, validation.Required),
 		validation.Field(&c.Location, validation.Required),
@@ -24,7 +23,6 @@ func (c ViolationRequest) Validate() error {
 func (c ViolationEditRequest) Validate() error {
 	if err := validation.ValidateStruct(&c,
 		validation.Field(&c.NoIdentity, validation.Required),
-		validation.Field(&c.OwnerID, validation.Required),
 		validation.Field(&c.TypeViolation, validation.Required),
 		validation.Field(&c.DetailViolation, validation.Required),
 		validation.Field(&c.Location, validation.Required),

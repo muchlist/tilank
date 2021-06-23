@@ -39,7 +39,6 @@ type TruckScoreEdit struct {
 
 // TruckRequest user input, id tidak diinput oleh user
 type TruckRequest struct {
-	Branch     string `json:"branch" bson:"branch"`
 	NoIdentity string `json:"no_identity" bson:"no_identity"`
 	NoPol      string `json:"no_pol" bson:"no_pol"`
 	Mark       string `json:"mark" bson:"mark"`

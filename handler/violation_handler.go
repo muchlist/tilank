@@ -132,13 +132,13 @@ func (vh *violationHandler) UploadImage(c *fiber.Ctx) error {
 
 	randomName := fmt.Sprintf("%s%v", id, time.Now().Unix())
 	// simpan image
-	pathInDb, apiErr := saveImage(c, *claims, "violation", randomName, false)
+	pathInDB, apiErr := saveImage(c, *claims, "violation", randomName, false)
 	if apiErr != nil {
 		return c.Status(apiErr.Status()).JSON(fiber.Map{"error": apiErr, "data": nil})
 	}
 
 	// update path image di database
-	violationResult, apiErr := vh.service.PutImage(*claims, id, pathInDb)
+	violationResult, apiErr := vh.service.PutImage(*claims, id, pathInDB)
 	if apiErr != nil {
 		return c.Status(apiErr.Status()).JSON(fiber.Map{"error": apiErr, "data": nil})
 	}

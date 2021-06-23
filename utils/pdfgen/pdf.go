@@ -5,36 +5,36 @@ import (
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"strconv"
 	"tilank/dto"
 	"time"
 )
 
-func GeneratePDF(data *dto.Violation) error {
+func GeneratePDF(viol *dto.Violation, truck *dto.Truck, rules *dto.Rules) error {
+	if rules == nil {
+		rules = &dto.Rules{
+			ID:          primitive.ObjectID{},
+			Description: "Diberikan teguran.",
+		}
+	}
+
 	m := pdf.NewMaroto(consts.Portrait, consts.A4)
+	m.SetCompression(true)
 	m.SetPageMargins(20, 10, 20)
-
-	// pelanggaran ke berapa
-	// sangsinya apa
-
-	// 1 , 2 teguran
-	// 3 ban 7 hari
-	// 4 teguran kembali
-	// 5 ban 2 minggu
-	// 6 ban 30 hari
-	// 7 ban 2 bulan
 
 	err := buildHeading(m)
 	if err != nil {
 		return err
 	}
-	buildBody(m, data)
-	err = buildImage(m, data)
+	buildBody(m, viol, truck, rules)
+	err = buildImage(m, viol)
 	if err != nil {
 		return err
 	}
-	buildSignature(m, data)
+	buildSignature(m, viol)
 
-	err = m.OutputFileAndClose(fmt.Sprintf("static/pdf/%s.pdf", data.ID.Hex()))
+	err = m.OutputFileAndClose(fmt.Sprintf("static/pdf/%s.pdf", viol.ID.Hex()))
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func buildHeading(m pdf.Maroto) error {
 	return errHead
 }
 
-func buildBody(m pdf.Maroto, data *dto.Violation) {
+func buildBody(m pdf.Maroto, viol *dto.Violation, truck *dto.Truck, rules *dto.Rules) {
 	m.Row(5, func() {
 
 	})
@@ -87,17 +87,17 @@ func buildBody(m pdf.Maroto, data *dto.Violation) {
 			textBody(m, "Detail Pelanggaran", 25)
 		})
 		m.Col(4, func() {
-			textBody(m, data.NoIdentity, 0)
-			textBody(m, data.NoPol, 5)
-			textBody(m, data.Location, 10)
-			textBody(m, time.Unix(data.CreatedAt, 0).Format("02-01-2006 15:04"), 15)
-			textBody(m, "2", 20) // todo pelanggaran keberapa
-			textBody(m, data.DetailViolation, 25)
+			textBody(m, viol.NoIdentity, 0)
+			textBody(m, viol.NoPol, 5)
+			textBody(m, viol.Location, 10)
+			textBody(m, time.Unix(viol.CreatedAt, 0).Format("02-01-2006 15:04"), 15)
+			textBody(m, strconv.Itoa(truck.Score), 20)
+			textBody(m, viol.DetailViolation, 25)
 		})
 		m.ColSpace(1)
 		m.Col(3, func() {
-			textBody(m, "Diberikan teguran ke dua (2), apabila melakukan pelanggaran 1 kali lagi di tahun yang sama maka akan dilakukan pemblokiran saat gate in pada truck dengan tersenbut", 0)
-		}) // todo sangsinya apa
+			textBody(m, rules.Description, 0)
+		})
 	})
 }
 

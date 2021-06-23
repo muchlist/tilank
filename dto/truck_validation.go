@@ -9,9 +9,7 @@ func (t TruckRequest) Validate() error {
 	if err := validation.ValidateStruct(&t,
 		validation.Field(&t.NoIdentity, validation.Required),
 		validation.Field(&t.NoPol, validation.Required),
-		validation.Field(&t.Mark, validation.Required),
 		validation.Field(&t.Owner, validation.Required),
-		validation.Field(&t.Hp, validation.Required),
 		validation.Field(&t.Email, validation.Required, is.Email),
 	); err != nil {
 		return err
@@ -23,7 +21,6 @@ func (t TruckEditRequest) Validate() error {
 	if err := validation.ValidateStruct(&t,
 		validation.Field(&t.NoIdentity, validation.Required),
 		validation.Field(&t.NoPol, validation.Required),
-		validation.Field(&t.Mark, validation.Required),
 		validation.Field(&t.Owner, validation.Required),
 		validation.Field(&t.Email, validation.Required, is.Email),
 		validation.Field(&t.FilterTimestamp, validation.Required),

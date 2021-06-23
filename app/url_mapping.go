@@ -52,7 +52,7 @@ func mapUrls(app *fiber.App) {
 	api.Get("/violation", middleware.NormalAuth(), violationHandler.Find)
 	api.Post("/violation-upload-image/:id", middleware.NormalAuth(), violationHandler.UploadImage)
 	api.Get("/violation-delete-image/:id/:image", middleware.NormalAuth(), violationHandler.DeleteImage)
-	api.Get("/violation-pdf/:id", middleware.NormalAuth(), violationHandler.GeneratePDF)
+	api.Get("/violation-pdf/:id", middleware.NormalAuth(config.RoleHSSE), violationHandler.GeneratePDF)
 
 	// JPT
 	api.Post("/jpt", middleware.NormalAuth(config.RoleHSSE), jptHandler.Insert)
@@ -61,6 +61,14 @@ func mapUrls(app *fiber.App) {
 	api.Delete("/jpt/:id", middleware.NormalAuth(config.RoleHSSE), jptHandler.Delete)
 	// Query [branch, name, active ]
 	api.Get("/jpt", middleware.NormalAuth(), jptHandler.Find)
+
+	// TRUCK
+	api.Post("/truck", middleware.NormalAuth(config.RoleHSSE), truckHandler.Insert)
+	api.Get("/truck/:id", middleware.NormalAuth(), truckHandler.Get)
+	api.Put("/truck/:id", middleware.NormalAuth(config.RoleHSSE), truckHandler.Edit)
+	api.Delete("/truck/:id", middleware.NormalAuth(config.RoleHSSE), truckHandler.Delete)
+	//  Query [branch, identity, owner, active, block ]
+	api.Get("/truck", middleware.NormalAuth(), truckHandler.Find)
 
 	// RULES
 	api.Post("/rules", middleware.NormalAuth(config.RoleHSSE), rulesHandler.Insert)

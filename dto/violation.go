@@ -24,7 +24,6 @@ type Violation struct {
 	NoPol           string     `json:"no_pol" bson:"no_pol"`
 	Mark            string     `json:"mark" bson:"mark"`
 	Owner           string     `json:"owner" bson:"owner"`
-	OwnerID         string     `json:"owner_id" bson:"owner_id"`
 	TypeViolation   string     `json:"type_violation" bson:"type_violation"`
 	DetailViolation string     `json:"detail_violation" bson:"detail_violation"`
 	TimeViolation   int64      `json:"time_violation" bson:"time_violation"`
@@ -38,9 +37,6 @@ type ViolationRequest struct {
 	// State 0 Draft, 1 Need Approve, 2 Approved, 3 sendToJPT
 	State           enum.State `json:"state" bson:"state"`
 	NoIdentity      string     `json:"no_identity" bson:"no_identity"`
-	NoPol           string     `json:"no_pol" bson:"no_pol"`
-	Mark            string     `json:"mark" bson:"mark"`
-	OwnerID         string     `json:"owner_id" bson:"owner_id"`
 	TypeViolation   string     `json:"type_violation" bson:"type_violation"`
 	DetailViolation string     `json:"detail_violation" bson:"detail_violation"`
 	TimeViolation   int64      `json:"time_violation" bson:"time_violation"`
@@ -64,7 +60,6 @@ type ViolationEdit struct {
 	NoPol           string
 	Mark            string
 	Owner           string
-	OwnerID         string
 	TypeViolation   string
 	DetailViolation string
 	TimeViolation   int64
@@ -93,9 +88,6 @@ type ViolationEditRequest struct {
 	// State 0 Draft, 1 Need Approve, 2 Approved, 3 sendToJPT
 	State           int    `json:"state" bson:"state"`
 	NoIdentity      string `json:"no_identity" bson:"no_identity"`
-	NoPol           string `json:"no_pol" bson:"no_pol"`
-	Mark            string `json:"mark" bson:"mark"`
-	OwnerID         string `json:"owner_id" bson:"owner_id"`
 	TypeViolation   string `json:"type_violation" bson:"type_violation"`
 	DetailViolation string `json:"detail_violation" bson:"detail_violation"`
 	TimeViolation   int64  `json:"time_violation" bson:"time_violation"`

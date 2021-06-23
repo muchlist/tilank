@@ -3,6 +3,7 @@ package app
 import (
 	"tilank/dao/jptdao"
 	"tilank/dao/rulesdao"
+	"tilank/dao/truckdao"
 	"tilank/dao/userdao"
 	"tilank/dao/violationdao"
 	"tilank/handler"
@@ -20,12 +21,14 @@ var (
 	userDao      = userdao.NewUserDao()
 	violationDao = violationdao.NewViolationDao()
 	jptDao       = jptdao.NewJptDao()
+	truckDao     = truckdao.NewTruckDao()
 	rulesDao     = rulesdao.NewRulesDao()
 
 	// Service
 	userService      = service.NewUserService(userDao, cryptoUtils, jwt)
 	jptService       = service.NewJptService(jptDao)
-	violationService = service.NewViolationService(violationDao, jptDao)
+	violationService = service.NewViolationService(violationDao, truckDao, rulesDao)
+	truckService     = service.NewTruckService(truckDao)
 	rulesService     = service.NewRulesService(rulesDao)
 
 	// Controller or Handler
@@ -33,5 +36,6 @@ var (
 	userHandler      = handler.NewUserHandler(userService)
 	violationHandler = handler.NewViolationHandler(violationService)
 	jptHandler       = handler.NewJptHandler(jptService)
+	truckHandler     = handler.NewTruckHandler(truckService)
 	rulesHandler     = handler.NewRulesHandler(rulesService)
 )

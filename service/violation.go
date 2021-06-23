@@ -1,8 +1,10 @@
 package service
 
 import (
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"tilank/dao/jptdao"
+	"tilank/dao/rulesdao"
+	"tilank/dao/truckdao"
 	"tilank/dao/violationdao"
 	"tilank/dto"
 	"tilank/enum"
@@ -13,30 +15,20 @@ import (
 	"time"
 )
 
-func NewViolationService(violationDao violationdao.ViolationDaoAssumer, jptDao jptdao.JptDaoAssumer) *ViolationService {
+func NewViolationService(violationDao violationdao.ViolationDaoAssumer,
+	truckDao truckdao.TruckDaoAssumer,
+	rulesDao rulesdao.RulesDaoAssumer) *ViolationService {
 	return &ViolationService{
 		vDao: violationDao,
-		jDao: jptDao,
+		tDao: truckDao,
+		rDao: rulesDao,
 	}
 }
 
 type ViolationService struct {
 	vDao violationdao.ViolationDaoAssumer
-	jDao jptdao.JptDaoAssumer
-}
-
-func getJPTName(jDao jptdao.JptDaoAssumer, ownerID string) (string, resterr.APIError) {
-	oid, errT := primitive.ObjectIDFromHex(ownerID)
-	if errT != nil {
-		return "", resterr.NewBadRequestError("Owner ID yang dimasukkan salah")
-	}
-
-	jpt, err := jDao.GetJptByID(oid, "")
-	if err != nil {
-		return "", err
-	}
-
-	return jpt.Name, nil
+	tDao truckdao.TruckDaoAssumer
+	rDao rulesdao.RulesDaoAssumer
 }
 
 func (v *ViolationService) InsertViolation(user mjwt.CustomClaim, input dto.ViolationRequest) (*string, resterr.APIError) {
@@ -49,8 +41,8 @@ func (v *ViolationService) InsertViolation(user mjwt.CustomClaim, input dto.Viol
 		state = enum.StDraft
 	}
 
-	// mendapatkan nama jpt
-	jptName, err := getJPTName(v.jDao, input.OwnerID)
+	// mendapatkan truck
+	truck, err := v.tDao.GetTruckByIdentity(input.NoIdentity, user.Branch)
 	if err != nil {
 		return nil, err
 	}
@@ -70,11 +62,10 @@ func (v *ViolationService) InsertViolation(user mjwt.CustomClaim, input dto.Viol
 		ApprovedByID:    "",
 		Branch:          user.Branch,
 		State:           state,
-		NoIdentity:      input.NoIdentity,
-		NoPol:           input.NoPol,
-		Mark:            input.Mark,
-		Owner:           jptName,
-		OwnerID:         input.OwnerID,
+		NoIdentity:      truck.NoIdentity,
+		NoPol:           truck.NoPol,
+		Mark:            truck.Mark,
+		Owner:           truck.Owner,
 		TypeViolation:   input.TypeViolation,
 		DetailViolation: input.DetailViolation,
 		TimeViolation:   input.TimeViolation,
@@ -97,7 +88,7 @@ func (v *ViolationService) EditViolation(user mjwt.CustomClaim, violationID stri
 		return nil, resterr.NewBadRequestError("ObjectID yang dimasukkan salah")
 	}
 
-	jptOwnerName, err := getJPTName(v.jDao, input.OwnerID)
+	truck, err := v.tDao.GetTruckByIdentity(input.NoIdentity, user.Branch)
 	if err != nil {
 		return nil, err
 	}
@@ -114,11 +105,10 @@ func (v *ViolationService) EditViolation(user mjwt.CustomClaim, violationID stri
 		ApprovedAt:      0,
 		ApprovedBy:      "",
 		ApprovedByID:    "",
-		NoIdentity:      input.NoIdentity,
-		NoPol:           input.NoPol,
-		Mark:            input.Mark,
-		Owner:           jptOwnerName,
-		OwnerID:         input.OwnerID,
+		NoIdentity:      truck.NoIdentity,
+		NoPol:           truck.NoPol,
+		Mark:            truck.Mark,
+		Owner:           truck.Owner,
 		TypeViolation:   input.TypeViolation,
 		DetailViolation: input.DetailViolation,
 		TimeViolation:   input.TimeViolation,
@@ -221,19 +211,19 @@ func (v *ViolationService) ApproveViolation(user mjwt.CustomClaim, violationID s
 		return nil, resterr.NewBadRequestError("ObjectID yang dimasukkan salah")
 	}
 
-	// cek dokumen eksisting
+	// 1 cek dokumen eksisting
 	violation, err := v.vDao.GetViolationByID(oid, "")
 	if err != nil {
 		return nil, err
 	}
 
-	// validasi
+	// 2 validasi
 	if violation.State != enum.StNeedApprove {
 		apiErr := resterr.NewBadRequestError("status dokumen tidak dapat di approve")
 		return nil, apiErr
 	}
 
-	// Filling data
+	// 3 Filling data
 	timeNow := time.Now().Unix()
 	data := dto.ViolationConfirm{
 		ID:           oid,
@@ -247,10 +237,59 @@ func (v *ViolationService) ApproveViolation(user mjwt.CustomClaim, violationID s
 		State:        enum.StApproved,
 	}
 
-	// DB
+	// 4 DB
 	violationApproved, err := v.vDao.ChangeStateViolation(data)
 	if err != nil {
 		return nil, err
+	}
+
+	// 5 mendapatkan data truck eksisting
+	truck, err := v.tDao.GetTruckByIdentity(violationApproved.NoIdentity, violationApproved.Branch)
+	if err != nil {
+		logger.
+			Error(fmt.Sprintf(
+				"error di ApproveViolation 5 mendapatkan data truck eksisting, need roleback. id : %s",
+				violationID),
+				err)
+		return nil, err
+	}
+
+	payloadTruck := dto.TruckScoreEdit{
+		ID:             truck.ID,
+		Score:          truck.Score + 1,
+		ResetScoreDate: 0,
+		Blocked:        false,
+		BlockStart:     0,
+		BlockEnd:       0,
+	}
+
+	// 6 mendapatkan rules block truck
+	rules, _ := v.rDao.GetRulesByScore(payloadTruck.Score, truck.Branch)
+	if rules != nil {
+		timeNow = time.Now().Unix()
+		// jika ditemukan role pemblokiran
+		if rules.BlockTime != 0 {
+			payloadTruck.Blocked = true
+			payloadTruck.BlockStart = timeNow
+			payloadTruck.BlockEnd = timeNow + rules.BlockTime
+		}
+	}
+
+	// 7 menambahkan status di truck
+	truckUpdated, err := v.tDao.ChangeScore(payloadTruck)
+	if err != nil {
+		logger.
+			Error(fmt.Sprintf(
+				"error di ApproveViolation 7 menambahkan status di truck, need roleback. id : %s",
+				violationID),
+				err)
+		return nil, err
+	}
+
+	// 8 membuat pdf
+	errPdf := pdfgen.GeneratePDF(violationApproved, truckUpdated, rules)
+	if errPdf != nil {
+		logger.Error(fmt.Sprintf("membuat pdf gagal. id : %s", violationID), errPdf)
 	}
 
 	return violationApproved, nil
@@ -338,12 +377,39 @@ func (v *ViolationService) GeneratePDFViolation(violationID string) (*dto.Violat
 		return nil, resterr.NewBadRequestError("ObjectID yang dimasukkan salah")
 	}
 
+	// 1 mendapatkan dokumen pelanggaran
 	violation, err := v.vDao.GetViolationByID(oid, "")
 	if err != nil {
 		return nil, err
 	}
 
-	errPdf := pdfgen.GeneratePDF(violation)
+	// 2 mendapatkan data pelanggaran ini adalah pelanggaran keberapa
+	violations, err := v.vDao.FindViolation(dto.FilterViolation{
+		FilterBranch:     violation.Branch,
+		FilterNoIdentity: violation.NoIdentity,
+		FilterState:      2,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	violationScore := 0
+	for i, v := range violations {
+		if v.ID == violation.ID {
+			// karena sort violation terbalik yang terbaru (index 0) adalah
+			// pelanggaran dengan skor lebih tinggi
+			violationScore = len(violations) - i
+		}
+	}
+	// 3 mendapatkan rules block truck
+	rules, _ := v.rDao.GetRulesByScore(violationScore, violation.Branch)
+
+	// 4 dummy truck, pdf hanya melihat score saja
+	truck := &dto.Truck{
+		Score: violationScore,
+	}
+
+	errPdf := pdfgen.GeneratePDF(violation, truck, rules)
 	if errPdf != nil {
 		logger.Error("membuat pdf gagal", errPdf)
 	}

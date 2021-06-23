@@ -34,7 +34,6 @@ const (
 	keyViolNoPol           = "no_pol"
 	keyViolMark            = "mark"
 	keyViolOwner           = "owner"
-	keyViolOwnerID         = "owner_id"
 	keyViolTypeViolation   = "type_violation"
 	keyViolDetailViolation = "detail_violation"
 	keyViolTimeViolation   = "time_violation"
@@ -112,7 +111,6 @@ func (c *violationDao) EditViolation(input dto.ViolationEdit) (*dto.Violation, r
 			keyViolNoPol:           input.NoPol,
 			keyViolMark:            input.Mark,
 			keyViolOwner:           input.Owner,
-			keyViolOwnerID:         input.OwnerID,
 			keyViolTypeViolation:   input.TypeViolation,
 			keyViolDetailViolation: input.DetailViolation,
 			keyViolTimeViolation:   input.TimeViolation,
@@ -344,7 +342,7 @@ func (c *violationDao) FindViolation(filterA dto.FilterViolation) (dto.Violation
 	}
 
 	opts := options.Find()
-	opts.SetSort(bson.D{{keyViolID, -1}}) //nolint:govet
+	opts.SetSort(bson.D{{keyViolUpdatedAt, -1}}) //nolint:govet
 	opts.SetLimit(filterA.Limit)
 
 	cursor, err := coll.Find(ctx, filter, opts)

@@ -53,6 +53,7 @@ type TruckDaoAssumer interface {
 	ChangeScore(input dto.TruckScoreEdit) (*dto.Truck, resterr.APIError)
 
 	GetTruckByID(truckID primitive.ObjectID, branchIfSpecific string) (*dto.Truck, resterr.APIError)
+	GetTruckByIdentity(noIdentity string, branch string) (*dto.Truck, resterr.APIError)
 	FindTruck(filter dto.FilterTruck) (dto.TruckResponseMinList, resterr.APIError)
 }
 
@@ -61,6 +62,8 @@ func (c *truckDao) InsertTruck(input dto.Truck) (*string, resterr.APIError) {
 	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
 	defer cancel()
 
+	input.NoIdentity = strings.ReplaceAll(strings.ToUpper(input.NoIdentity), " ", "")
+	input.NoPol = strings.ReplaceAll(strings.ToUpper(input.NoPol), " ", "")
 	input.Owner = strings.ToUpper(input.Owner)
 	input.Branch = strings.ToUpper(input.Branch)
 	input.Email = strings.ToLower(input.Email)
@@ -82,6 +85,8 @@ func (c *truckDao) EditTruck(input dto.TruckEdit) (*dto.Truck, resterr.APIError)
 	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
 	defer cancel()
 
+	input.NoIdentity = strings.ReplaceAll(strings.ToUpper(input.NoIdentity), " ", "")
+	input.NoPol = strings.ReplaceAll(strings.ToUpper(input.NoPol), " ", "")
 	input.FilterBranch = strings.ToUpper(input.FilterBranch)
 	input.Owner = strings.ToUpper(input.Owner)
 	input.Email = strings.ToLower(input.Email)
@@ -218,13 +223,38 @@ func (c *truckDao) GetTruckByID(truckID primitive.ObjectID, branchIfSpecific str
 	return &truck, nil
 }
 
+func (c *truckDao) GetTruckByIdentity(noIdentity string, branch string) (*dto.Truck, resterr.APIError) {
+	coll := db.DB.Collection(keyTruckCollection)
+	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
+	defer cancel()
+
+	noIdentity = strings.ReplaceAll(strings.ToUpper(noIdentity), " ", "")
+	branch = strings.ToUpper(branch)
+
+	filter := bson.M{keyNoIdentity: noIdentity, keyTruckBranch: branch}
+
+	var truck dto.Truck
+	if err := coll.FindOne(ctx, filter).Decode(&truck); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			apiErr := resterr.NewNotFoundError(fmt.Sprintf("Truck dengan nomor lambung %s tidak ditemukan", noIdentity))
+			return nil, apiErr
+		}
+
+		logger.Error("gagal mendapatkan truck dari database (GetTruckByID)", err)
+		apiErr := resterr.NewInternalServerError("Gagal mendapatkan truck dari database", err)
+		return nil, apiErr
+	}
+
+	return &truck, nil
+}
+
 func (c *truckDao) FindTruck(filterA dto.FilterTruck) (dto.TruckResponseMinList, resterr.APIError) {
 	coll := db.DB.Collection(keyTruckCollection)
 	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
 	defer cancel()
 
 	filterA.FilterBranch = strings.ToUpper(filterA.FilterBranch)
-	filterA.FilterNoIdentity = strings.ToUpper(filterA.FilterNoIdentity)
+	filterA.FilterNoIdentity = strings.ReplaceAll(strings.ToUpper(filterA.FilterNoIdentity), " ", "")
 	filterA.FilterOwner = strings.ToUpper(filterA.FilterOwner)
 
 	// filter

@@ -20,7 +20,7 @@ func RunApp() {
 
 	app := fiber.New()
 	mapUrls(app)
-	if err := app.Listen(":3500"); err != nil {
+	if err := app.Listen(":3501"); err != nil {
 		logger.Error("error fiber listen", err)
 		return
 	}
