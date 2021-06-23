@@ -16,6 +16,13 @@ func GeneratePDF(data *dto.Violation) error {
 	// pelanggaran ke berapa
 	// sangsinya apa
 
+	// 1 , 2 teguran
+	// 3 ban 7 hari
+	// 4 teguran kembali
+	// 5 ban 2 minggu
+	// 6 ban 30 hari
+	// 7 ban 2 bulan
+
 	err := buildHeading(m)
 	if err != nil {
 		return err

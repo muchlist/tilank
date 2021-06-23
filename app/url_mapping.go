@@ -61,4 +61,11 @@ func mapUrls(app *fiber.App) {
 	api.Delete("/jpt/:id", middleware.NormalAuth(config.RoleHSSE), jptHandler.Delete)
 	// Query [branch, name, active ]
 	api.Get("/jpt", middleware.NormalAuth(), jptHandler.Find)
+
+	// RULES
+	api.Post("/rules", middleware.NormalAuth(config.RoleHSSE), rulesHandler.Insert)
+	api.Get("/rules/:id", middleware.NormalAuth(), rulesHandler.Get)
+	api.Put("/rules/:id", middleware.NormalAuth(config.RoleHSSE), rulesHandler.Edit)
+	api.Delete("/rules/:id", middleware.NormalAuth(config.RoleHSSE), rulesHandler.Delete)
+	api.Get("/rules", middleware.NormalAuth(), rulesHandler.Find)
 }

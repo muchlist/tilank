@@ -27,3 +27,11 @@ type FilterJpt struct {
 	FilterName   string
 	Active       bool
 }
+
+type FilterTruck struct {
+	FilterBranch     string
+	FilterNoIdentity string
+	FilterOwner      string
+	Active           bool
+	Blocked          bool
+}
