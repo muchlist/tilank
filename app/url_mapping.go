@@ -17,7 +17,7 @@ func mapUrls(app *fiber.App) {
 	app.Use(middleware.LimitRequest())
 
 	app.Static("/image/avatar", "./static/image/avatar")
-	app.Static("/image/avatar", "./static/image/violation")
+	app.Static("/image/violation", "./static/image/violation")
 
 	api := app.Group("/api/v1")
 

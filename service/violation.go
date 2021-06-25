@@ -41,6 +41,10 @@ func (v *ViolationService) InsertViolation(user mjwt.CustomClaim, input dto.Viol
 		state = enum.StDraft
 	}
 
+	if input.TimeViolation == 0 {
+		input.TimeViolation = time.Now().Unix()
+	}
+
 	// mendapatkan truck
 	truck, err := v.tDao.GetTruckByIdentity(input.NoIdentity, user.Branch)
 	if err != nil {
@@ -91,6 +95,10 @@ func (v *ViolationService) EditViolation(user mjwt.CustomClaim, violationID stri
 	truck, err := v.tDao.GetTruckByIdentity(input.NoIdentity, user.Branch)
 	if err != nil {
 		return nil, err
+	}
+
+	if input.TimeViolation == 0 {
+		input.TimeViolation = time.Now().Unix()
 	}
 
 	// Filling data
