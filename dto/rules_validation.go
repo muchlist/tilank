@@ -7,7 +7,7 @@ import (
 func (r RulesRequest) Validate() error {
 	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.Score, validation.Required),
-		validation.Field(&r.BlockTime, validation.Required, validation.Min(0)),
+		validation.Field(&r.BlockTime, validation.Min(0)),
 		validation.Field(&r.Description, validation.Required),
 	); err != nil {
 		return err
@@ -18,7 +18,7 @@ func (r RulesRequest) Validate() error {
 func (r RulesEditRequest) Validate() error {
 	if err := validation.ValidateStruct(&r,
 		validation.Field(&r.Score, validation.Required),
-		validation.Field(&r.BlockTime, validation.Required, validation.Min(0)),
+		validation.Field(&r.BlockTime, validation.Min(0)),
 		validation.Field(&r.Description, validation.Required),
 		validation.Field(&r.FilterTimestamp, validation.Required),
 	); err != nil {

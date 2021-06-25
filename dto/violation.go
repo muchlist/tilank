@@ -97,8 +97,12 @@ type ViolationEditRequest struct {
 type ViolationResponseMinList []ViolationResponseMin
 
 type ViolationResponseMin struct {
-	ID     primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
-	Branch string             `json:"branch" bson:"branch"`
+	ID         primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	CreatedAt  int64              `json:"created_at" bson:"created_at"`
+	CreatedBy  string             `json:"created_by" bson:"created_by"`
+	ApprovedAt int64              `json:"approved_at" bson:"approved_at"`
+	ApprovedBy string             `json:"approved_by" bson:"approved_by"`
+	Branch     string             `json:"branch" bson:"branch"`
 	// State 0 Draft, 1 Need Approve, 2 Approved, 3 sendToJPT
 	State           enum.State `json:"state" bson:"state"`
 	NoIdentity      string     `json:"no_identity" bson:"no_identity"`
