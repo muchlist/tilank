@@ -22,6 +22,11 @@ type TruckService struct {
 func (j *TruckService) InsertTruck(user mjwt.CustomClaim, input dto.TruckRequest) (*string, resterr.APIError) {
 	idGenerated := primitive.NewObjectID()
 
+	truckExisting, _ := j.daoC.GetTruckByIdentity(input.NoIdentity, user.Branch)
+	if truckExisting != nil {
+		return nil, resterr.NewBadRequestError("Nomor lambung tidak tersedia! ")
+	}
+
 	// Filling data
 	timeNow := time.Now().Unix()
 	data := dto.Truck{

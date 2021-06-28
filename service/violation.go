@@ -231,7 +231,18 @@ func (v *ViolationService) ApproveViolation(user mjwt.CustomClaim, violationID s
 		return nil, apiErr
 	}
 
-	// 3 Filling data
+	// 3 mendapatkan data truck eksisting
+	truck, err := v.tDao.GetTruckByIdentity(violation.NoIdentity, violation.Branch)
+	if err != nil {
+		logger.
+			Error(fmt.Sprintf(
+				"error di ApproveViolation 5 mendapatkan data truck eksisting, need roleback. id : %s",
+				violationID),
+				err)
+		return nil, err
+	}
+
+	// 4 Filling data
 	timeNow := time.Now().Unix()
 	data := dto.ViolationConfirm{
 		ID:           oid,
@@ -243,22 +254,12 @@ func (v *ViolationService) ApproveViolation(user mjwt.CustomClaim, violationID s
 		ApprovedBy:   user.Name,
 		ApprovedByID: user.Identity,
 		State:        enum.StApproved,
+		NViol:        truck.Score + 1,
 	}
 
-	// 4 DB
+	// 5 DB
 	violationApproved, err := v.vDao.ChangeStateViolation(data)
 	if err != nil {
-		return nil, err
-	}
-
-	// 5 mendapatkan data truck eksisting
-	truck, err := v.tDao.GetTruckByIdentity(violationApproved.NoIdentity, violationApproved.Branch)
-	if err != nil {
-		logger.
-			Error(fmt.Sprintf(
-				"error di ApproveViolation 5 mendapatkan data truck eksisting, need roleback. id : %s",
-				violationID),
-				err)
 		return nil, err
 	}
 

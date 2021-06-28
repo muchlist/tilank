@@ -141,13 +141,12 @@ func buildSignature(m pdf.Maroto, data *dto.Violation) {
 
 	})
 	m.Row(8, func() {
-		m.ColSpace(8)
 		m.Col(4, func() {
 			textBodyCenter(m, fmt.Sprintf("Banjarmain %s", approveAt), 0)
 		})
+		m.ColSpace(8)
 	})
 	m.Row(25, func() {
-		m.ColSpace(8)
 		m.Col(4, func() {
 			m.QrCode(data.ID.Hex(), props.Rect{
 				Top:     0,
@@ -155,11 +154,12 @@ func buildSignature(m pdf.Maroto, data *dto.Violation) {
 				Center:  true,
 			})
 		})
+		m.ColSpace(8)
 	})
 	m.Row(10, func() {
-		m.ColSpace(8)
 		m.Col(4, func() {
 			textBodyCenter(m, "HSSE TPKB", 5)
 		})
+		m.ColSpace(8)
 	})
 }

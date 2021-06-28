@@ -20,6 +20,7 @@ type Violation struct {
 	Branch       string             `json:"branch" bson:"branch"`
 	// State 0 Draft, 1 Need Approve, 2 Approved, 3 sendToJPT
 	State           enum.State `json:"state" bson:"state"`
+	NViol           int        `json:"n_viol" bson:"n_viol"`
 	NoIdentity      string     `json:"no_identity" bson:"no_identity"`
 	NoPol           string     `json:"no_pol" bson:"no_pol"`
 	Mark            string     `json:"mark" bson:"mark"`
@@ -79,6 +80,7 @@ type ViolationConfirm struct {
 	ApprovedByID string
 
 	State enum.State
+	NViol int
 }
 
 // ViolationEditRequest user input
@@ -105,6 +107,7 @@ type ViolationResponseMin struct {
 	Branch     string             `json:"branch" bson:"branch"`
 	// State 0 Draft, 1 Need Approve, 2 Approved, 3 sendToJPT
 	State           enum.State `json:"state" bson:"state"`
+	NViol           int        `json:"n_viol" bson:"n_viol"`
 	NoIdentity      string     `json:"no_identity" bson:"no_identity"`
 	NoPol           string     `json:"no_pol" bson:"no_pol"`
 	Owner           string     `json:"owner" bson:"owner"`
