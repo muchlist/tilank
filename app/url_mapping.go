@@ -18,6 +18,7 @@ func mapUrls(app *fiber.App) {
 
 	app.Static("/image/avatar", "./static/image/avatar")
 	app.Static("/image/violation", "./static/image/violation")
+	app.Static("/pdf", "./static/pdf")
 
 	api := app.Group("/api/v1")
 
