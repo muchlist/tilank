@@ -30,6 +30,7 @@ const (
 	keyViolApprovedByID    = "approved_by_id"
 	keyViolBranch          = "branch"
 	keyViolState           = "state"
+	keyViolNViol           = "n_viol"
 	keyViolNoIdentity      = "no_identity"
 	keyViolNoPol           = "no_pol"
 	keyViolMark            = "mark"
@@ -156,6 +157,7 @@ func (c *violationDao) ChangeStateViolation(input dto.ViolationConfirm) (*dto.Vi
 			keyViolApprovedByID: input.ApprovedByID,
 
 			keyViolState: input.State,
+			keyViolNViol: input.NViol,
 		},
 	}
 

@@ -66,6 +66,7 @@ func (v *ViolationService) InsertViolation(user mjwt.CustomClaim, input dto.Viol
 		ApprovedByID:    "",
 		Branch:          user.Branch,
 		State:           state,
+		NViol:           truck.Score,
 		NoIdentity:      truck.NoIdentity,
 		NoPol:           truck.NoPol,
 		Mark:            truck.Mark,
@@ -162,6 +163,7 @@ func (v *ViolationService) SendToDraftViolation(user mjwt.CustomClaim, violation
 		ApprovedBy:   "",
 		ApprovedByID: "",
 		State:        enum.StDraft,
+		NViol:        violation.NViol,
 	}
 
 	// DB
@@ -202,6 +204,7 @@ func (v *ViolationService) SendToConfirmationViolation(user mjwt.CustomClaim, vi
 		ApprovedBy:   "",
 		ApprovedByID: "",
 		State:        enum.StNeedApprove,
+		NViol:        violation.NViol,
 	}
 
 	// DB
