@@ -263,6 +263,11 @@ func (c *violationDao) DeleteImage(violationID primitive.ObjectID, imagePath str
 		}
 	}
 
+	// jika final images 0 maka isikan slice kosong, untuk menghindari nill di db
+	if len(finalImages) == 0 {
+		finalImages = []string{}
+	}
+
 	opts := options.FindOneAndUpdate()
 	opts.SetReturnDocument(1)
 
