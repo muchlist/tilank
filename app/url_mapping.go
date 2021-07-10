@@ -66,6 +66,7 @@ func mapUrls(app *fiber.App) {
 	// TRUCK
 	api.Post("/truck", middleware.NormalAuth(config.RoleHSSE), truckHandler.Insert)
 	api.Get("/truck/:id", middleware.NormalAuth(), truckHandler.Get)
+	api.Get("/truck-lambung/:id", middleware.NormalAuth(), truckHandler.GetByNoLambung)
 	api.Put("/truck/:id", middleware.NormalAuth(config.RoleHSSE), truckHandler.Edit)
 	api.Delete("/truck/:id", middleware.NormalAuth(config.RoleHSSE), truckHandler.Delete)
 	//  Query [branch, identity, owner, active, block ]

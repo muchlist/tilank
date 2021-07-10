@@ -140,6 +140,14 @@ func (j *TruckService) GetTruckByID(truckID string, branchIfSpecific string) (*d
 	return truck, nil
 }
 
+func (j *TruckService) GetTruckByNoLambung(truckID string, branch string) (*dto.Truck, resterr.APIError) {
+	truck, err := j.daoC.GetTruckByIdentity(truckID, branch)
+	if err != nil {
+		return nil, err
+	}
+	return truck, nil
+}
+
 func (j *TruckService) FindTruck(filter dto.FilterTruck) (dto.TruckResponseMinList, resterr.APIError) {
 	truckList, err := j.daoC.FindTruck(filter)
 	if err != nil {

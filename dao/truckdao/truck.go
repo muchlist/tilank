@@ -223,6 +223,7 @@ func (c *truckDao) GetTruckByID(truckID primitive.ObjectID, branchIfSpecific str
 	return &truck, nil
 }
 
+// GetTruckByIdentity berdasarkan Nomor Lambung
 func (c *truckDao) GetTruckByIdentity(noIdentity string, branch string) (*dto.Truck, resterr.APIError) {
 	coll := db.DB.Collection(keyTruckCollection)
 	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)

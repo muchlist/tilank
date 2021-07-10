@@ -96,6 +96,19 @@ func (th *truckHandler) Get(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"error": nil, "data": truck})
 }
 
+// GetByNopol menampilkan truckDetail berdasarkan nopol
+func (th *truckHandler) GetByNoLambung(c *fiber.Ctx) error {
+	claims := c.Locals(mjwt.CLAIMS).(*mjwt.CustomClaim)
+	noLambung := c.Params("id")
+
+	truck, apiErr := th.service.GetTruckByNoLambung(noLambung, claims.Branch)
+	if apiErr != nil {
+		return c.Status(apiErr.Status()).JSON(fiber.Map{"error": apiErr, "data": nil})
+	}
+
+	return c.JSON(fiber.Map{"error": nil, "data": truck})
+}
+
 // Find menampilkan list truck
 // Query [branch, identity, owner, active, block ]
 func (th *truckHandler) Find(c *fiber.Ctx) error {
