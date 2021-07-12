@@ -12,6 +12,7 @@ import (
 	"tilank/utils/mjwt"
 	"tilank/utils/pdfgen"
 	"tilank/utils/rest_err"
+	"tilank/worker"
 	"time"
 )
 
@@ -302,6 +303,14 @@ func (v *ViolationService) ApproveViolation(user mjwt.CustomClaim, violationID s
 	errPdf := pdfgen.GeneratePDF(violationApproved, truckUpdated, rules)
 	if errPdf != nil {
 		logger.Error(fmt.Sprintf("membuat pdf gagal. id : %s", violationID), errPdf)
+	} else {
+		if truckUpdated.Email != "" {
+			worker.RegSendEmail(&worker.MailInfo{
+				ViolID:        violationID,
+				TruckIdentity: fmt.Sprintf("%s (%s)", truckUpdated.NoIdentity, truckUpdated.NoPol),
+				ToEmail:       truckUpdated.Email,
+			})
+		}
 	}
 
 	return violationApproved, nil
