@@ -161,6 +161,7 @@ func (j *TruckService) ResetBlockedTruck() (int64, resterr.APIError) {
 	// Cari truck dengan status blocked
 	truckList, err := j.daoC.FindTruck(dto.FilterTruck{
 		Blocked: true,
+		Active:  true,
 	})
 	if err != nil {
 		return 0, err
