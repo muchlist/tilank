@@ -54,7 +54,7 @@ func sendEmailGmail(violID string, violIdentity string, toEmail string) {
 	mailer.SetHeader("To", toEmail)
 	mailer.SetAddressHeader("Cc", emailCC, "HSSE TPKB")
 	mailer.SetHeader("Subject", "Pemberitahuan ETI TPKB")
-	mailer.SetBody("text/html", fmt.Sprintf("Pemberitahuan, truck anda dengan Nomor Lambung <b>%s</b> telah melakukan pelanggaran di area TPKB. terlampir surat Elektronik tilang TPKB", violIdentity))
+	mailer.SetBody("text/html", fmt.Sprintf("Pemberitahuan, truck anda dengan Nomor Lambung <b>%s</b> telah melakukan pelanggaran di area TPKB. terlampir surat Elektronik tilang TPKB.<br>Terimakasih.", violIdentity))
 	mailer.Attach(fmt.Sprintf("static/pdf/%s.pdf", violID))
 
 	dialer := gomail.NewDialer(
