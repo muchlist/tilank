@@ -55,6 +55,7 @@ type TruckDaoAssumer interface {
 	GetTruckByID(truckID primitive.ObjectID, branchIfSpecific string) (*dto.Truck, resterr.APIError)
 	GetTruckByIdentity(noIdentity string, branch string) (*dto.Truck, resterr.APIError)
 	FindTruck(filter dto.FilterTruck) (dto.TruckResponseMinList, resterr.APIError)
+	ResetTruckBlock(trucksID []primitive.ObjectID) (int64, resterr.APIError)
 }
 
 func (c *truckDao) InsertTruck(input dto.Truck) (*string, resterr.APIError) {
@@ -299,4 +300,38 @@ func (c *truckDao) FindTruck(filterA dto.FilterTruck) (dto.TruckResponseMinList,
 	}
 
 	return truckList, nil
+}
+
+func (c *truckDao) ResetTruckBlock(trucksID []primitive.ObjectID) (int64, resterr.APIError) {
+	coll := db.DB.Collection(keyTruckCollection)
+	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
+	defer cancel()
+
+	nowUnix := time.Now().Unix()
+
+	// Filter
+	filter := bson.M{
+		keyTruckID: bson.M{"$in": trucksID},
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			keyResetScoreDate: nowUnix,
+			keyBlocked:        false,
+			keyBlockStart:     0,
+			keyBlockEnd:       0,
+		},
+	}
+
+	result, err := coll.UpdateMany(ctx, filter, update)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return 0, resterr.NewBadRequestError("trucks tidak diupdate : truck dengan id tersebut tidak ditemukan")
+		}
+		logger.Error("Gagal mengupdate truck dari database (ResetTruckBlock)", err)
+		apiErr := resterr.NewInternalServerError("Gagal mengupdate truck dari database", err)
+		return 0, apiErr
+	}
+
+	return result.ModifiedCount, nil
 }

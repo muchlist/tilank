@@ -156,3 +156,36 @@ func (j *TruckService) FindTruck(filter dto.FilterTruck) (dto.TruckResponseMinLi
 
 	return truckList, nil
 }
+
+func (j *TruckService) ResetBlockedTruck() (int64, resterr.APIError) {
+	// Cari truck dengan status blocked
+	truckList, err := j.daoC.FindTruck(dto.FilterTruck{
+		Blocked: true,
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	// waktu sekarang untuk dibandingkan
+	nowUnix := time.Now().Unix()
+
+	// list id truck yang direset
+	var truckIDMustReset []primitive.ObjectID
+
+	for _, truck := range truckList {
+		if truck.BlockEnd <= nowUnix {
+			// reset status block truck
+			truckIDMustReset = append(truckIDMustReset, truck.ID)
+		}
+	}
+
+	var updated int64
+	if len(truckIDMustReset) != 0 {
+		updated, err = j.daoC.ResetTruckBlock(truckIDMustReset)
+		if err != nil {
+			return 0, nil
+		}
+	}
+
+	return updated, nil
+}
