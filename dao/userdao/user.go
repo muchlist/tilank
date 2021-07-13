@@ -28,6 +28,7 @@ const (
 	keyUserRoles     = "roles"
 	keyUserBranch    = "branch"
 	keyUserAvatar    = "avatar"
+	keyUserFcmToken  = "fcm_token"
 	keyUserTimeStamp = "timestamp"
 )
 
@@ -111,6 +112,39 @@ func (u *userDao) EditUser(userID string, userRequest dto.UserEditRequest) (*dto
 		}
 
 		logger.Error("Gagal mendapatkan user dari database", err)
+		apiErr := resterr.NewInternalServerError("Gagal mendapatkan user dari database", err)
+		return nil, apiErr
+	}
+
+	return &user, nil
+}
+
+func (u *userDao) EditFcm(userID string, fcmToken string) (*dto.UserResponse, resterr.APIError) {
+	coll := db.DB.Collection(keyUserColl)
+	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
+	defer cancel()
+
+	userID = strings.ToUpper(userID)
+
+	opts := options.FindOneAndUpdate()
+	opts.SetReturnDocument(1)
+
+	filter := bson.M{
+		keyUserID: userID,
+	}
+	update := bson.M{
+		"$set": bson.M{
+			keyUserFcmToken: fcmToken,
+		},
+	}
+
+	var user dto.UserResponse
+	if err := coll.FindOneAndUpdate(ctx, filter, update, opts).Decode(&user); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, resterr.NewBadRequestError("User tidak diupdate karena ID tidak valid")
+		}
+
+		logger.Error("Gagal mendapatkan user dari database (UpdateFCM)", err)
 		apiErr := resterr.NewInternalServerError("Gagal mendapatkan user dari database", err)
 		return nil, apiErr
 	}

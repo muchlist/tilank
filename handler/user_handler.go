@@ -100,6 +100,41 @@ func (usr *userHandler) Edit(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"error": nil, "data": userEdited})
 }
 
+// UpdateFcmToken mengupdateFCM token
+func (usr *userHandler) UpdateFcmToken(c *fiber.Ctx) error {
+	claims := c.Locals(mjwt.CLAIMS).(*mjwt.CustomClaim)
+
+	var fcmPayload dto.UserUpdateFcmRequest
+	if err := c.BodyParser(&fcmPayload); err != nil {
+		apiErr := resterr.NewBadRequestError(err.Error())
+		return c.Status(apiErr.Status()).JSON(fiber.Map{"error": apiErr, "data": nil})
+	}
+
+	if err := fcmPayload.Validate(); err != nil {
+		apiErr := resterr.NewBadRequestError(err.Error())
+		return c.Status(apiErr.Status()).JSON(fiber.Map{"error": apiErr, "data": nil})
+	}
+
+	userEdited, apiErr := usr.service.EditFcm(claims.Identity, fcmPayload.FcmToken)
+	if apiErr != nil {
+		return c.Status(apiErr.Status()).JSON(fiber.Map{"error": apiErr, "data": nil})
+	}
+
+	return c.JSON(fiber.Map{"error": nil, "data": userEdited})
+}
+
+// DeleteFcmToken menghapus FCM token
+func (usr *userHandler) DeleteFcmToken(c *fiber.Ctx) error {
+	claims := c.Locals(mjwt.CLAIMS).(*mjwt.CustomClaim)
+
+	_, apiErr := usr.service.EditFcm(claims.Identity, "")
+	if apiErr != nil {
+		return c.Status(apiErr.Status()).JSON(fiber.Map{"error": apiErr, "data": nil})
+	}
+
+	return c.JSON(fiber.Map{"error": nil, "data": "fcm di hapus"})
+}
+
 // Delete menghapus user, idealnya melalui middleware is_admin
 func (usr *userHandler) Delete(c *fiber.Ctx) error {
 	claims := c.Locals(mjwt.CLAIMS).(*mjwt.CustomClaim)

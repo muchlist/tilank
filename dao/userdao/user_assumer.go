@@ -8,6 +8,7 @@ import (
 type UserDaoAssumer interface {
 	InsertUser(user dto.UserRequest) (*string, resterr.APIError)
 	EditUser(userID string, userRequest dto.UserEditRequest) (*dto.UserResponse, resterr.APIError)
+	EditFcm(userID string, fcmToken string) (*dto.UserResponse, resterr.APIError)
 	DeleteUser(userID string) resterr.APIError
 	PutAvatar(userID string, avatar string) (*dto.UserResponse, resterr.APIError)
 	ChangePassword(data dto.UserChangePasswordRequest) resterr.APIError

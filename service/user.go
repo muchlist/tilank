@@ -30,6 +30,7 @@ type UserServiceAssumer interface {
 	InsertUser(dto.UserRequest) (*string, resterr.APIError)
 	FindUsers() (dto.UserResponseList, resterr.APIError)
 	EditUser(userID string, userEdit dto.UserEditRequest) (*dto.UserResponse, resterr.APIError)
+	EditFcm(userID string, fcmToken string) (*dto.UserResponse, resterr.APIError)
 	DeleteUser(userID string) resterr.APIError
 	Login(dto.UserLoginRequest) (*dto.UserLoginResponse, resterr.APIError)
 	Refresh(login dto.UserRefreshTokenRequest) (*dto.UserRefreshTokenResponse, resterr.APIError)
@@ -92,6 +93,14 @@ func (u *userService) InsertUser(user dto.UserRequest) (*string, resterr.APIErro
 // EditUser
 func (u *userService) EditUser(userID string, request dto.UserEditRequest) (*dto.UserResponse, resterr.APIError) {
 	result, err := u.dao.EditUser(userID, request)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (u *userService) EditFcm(userID string, fcmToken string) (*dto.UserResponse, resterr.APIError) {
+	result, err := u.dao.EditFcm(userID, fcmToken)
 	if err != nil {
 		return nil, err
 	}

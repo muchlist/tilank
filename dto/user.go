@@ -9,6 +9,7 @@ type User struct {
 	Roles     []string `json:"roles" bson:"roles"`
 	Avatar    string   `json:"avatar" bson:"avatar"`
 	HashPw    string   `json:"hash_pw,omitempty" bson:"hash_pw,omitempty"`
+	FcmToken  string   `json:"fcm_token" bson:"fcm_token"`
 	Timestamp int64    `json:"timestamp" bson:"timestamp"`
 }
 
@@ -23,6 +24,7 @@ type UserResponse struct {
 	Branch    string   `json:"branch" bson:"branch"`
 	Roles     []string `json:"roles" bson:"roles"`
 	Avatar    string   `json:"avatar" bson:"avatar"`
+	FcmToken  string   `json:"fcm_token" bson:"fcm_token"`
 	Timestamp int64    `json:"timestamp" bson:"timestamp"`
 }
 
@@ -36,6 +38,11 @@ type UserRequest struct {
 	Avatar    string   `json:"avatar" bson:"avatar"`
 	Password  string   `json:"password" bson:"password"`
 	Timestamp int64    `json:"timestamp" bson:"timestamp"`
+}
+
+// UserUpdateFcmRequest input fcm dari firebase client
+type UserUpdateFcmRequest struct {
+	FcmToken string `json:"fcm_token" bson:"fcm_token"`
 }
 
 // UserEditRequest input JSON oleh admin untuk mengedit user
