@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"strings"
+	"tilank/config"
 	"tilank/db"
 	"tilank/dto"
 	"tilank/utils/logger"
@@ -298,7 +299,7 @@ func (u *userDao) GetUserByIDWithPassword(userID string) (*dto.User, resterr.API
 }
 
 // FindUser mendapatkan daftar semua user dari database
-func (u *userDao) FindUser() (dto.UserResponseList, resterr.APIError) {
+func (u *userDao) FindUser(branch string) (dto.UserResponseList, resterr.APIError) {
 	coll := db.DB.Collection(keyUserColl)
 	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
 	defer cancel()
@@ -306,7 +307,38 @@ func (u *userDao) FindUser() (dto.UserResponseList, resterr.APIError) {
 	users := dto.UserResponseList{}
 	opts := options.Find()
 	opts.SetSort(bson.D{{keyUserID, -1}}) //nolint:govet
-	sortCursor, err := coll.Find(ctx, bson.M{}, opts)
+	sortCursor, err := coll.Find(ctx, bson.M{keyUserBranch: strings.ToUpper(branch)}, opts)
+	if err != nil {
+		logger.Error("Gagal mendapatkan user dari database", err)
+		apiErr := resterr.NewInternalServerError("Database error", err)
+		return dto.UserResponseList{}, apiErr
+	}
+
+	if err = sortCursor.All(ctx, &users); err != nil {
+		logger.Error("Gagal decode usersCursor ke objek slice", err)
+		apiErr := resterr.NewInternalServerError("Database error", err)
+		return dto.UserResponseList{}, apiErr
+	}
+
+	return users, nil
+}
+
+// FindUser mendapatkan daftar semua user dari database
+func (u *userDao) FindUserHSSE(branch string) (dto.UserResponseList, resterr.APIError) {
+	coll := db.DB.Collection(keyUserColl)
+	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
+	defer cancel()
+
+	// filter
+	filter := bson.M{
+		keyUserBranch: strings.ToUpper(branch),
+		keyUserRoles:  config.RoleHSSE,
+	}
+
+	users := dto.UserResponseList{}
+	opts := options.Find()
+	opts.SetSort(bson.D{{keyUserID, -1}}) //nolint:govet
+	sortCursor, err := coll.Find(ctx, filter, opts)
 	if err != nil {
 		logger.Error("Gagal mendapatkan user dari database", err)
 		apiErr := resterr.NewInternalServerError("Database error", err)

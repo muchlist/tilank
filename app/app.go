@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
+	"tilank/clients/fcm"
 	"tilank/db"
 	"tilank/scheduler"
 	"tilank/utils/logger"
@@ -16,8 +17,10 @@ func RunApp() {
 	defer func(client *mongo.Client, ctx context.Context) {
 		_ = client.Disconnect(ctx)
 	}(client, ctx)
-
 	defer cancel()
+
+	// inisasi firebase app
+	_ = fcm.Init()
 
 	app := fiber.New()
 	mapUrls(app)

@@ -3,8 +3,10 @@ package service
 import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"tilank/clients/fcm"
 	"tilank/dao/rulesdao"
 	"tilank/dao/truckdao"
+	"tilank/dao/userdao"
 	"tilank/dao/violationdao"
 	"tilank/dto"
 	"tilank/enum"
@@ -18,11 +20,15 @@ import (
 
 func NewViolationService(violationDao violationdao.ViolationDaoAssumer,
 	truckDao truckdao.TruckDaoAssumer,
-	rulesDao rulesdao.RulesDaoAssumer) *ViolationService {
+	rulesDao rulesdao.RulesDaoAssumer,
+	userDao userdao.UserDaoAssumer,
+	fcmClient fcm.ClientAssumer) *ViolationService {
 	return &ViolationService{
 		vDao: violationDao,
 		tDao: truckDao,
 		rDao: rulesDao,
+		uDao: userDao,
+		fcm:  fcmClient,
 	}
 }
 
@@ -30,6 +36,8 @@ type ViolationService struct {
 	vDao violationdao.ViolationDaoAssumer
 	tDao truckdao.TruckDaoAssumer
 	rDao rulesdao.RulesDaoAssumer
+	uDao userdao.UserDaoAssumer
+	fcm  fcm.ClientAssumer
 }
 
 func (v *ViolationService) InsertViolation(user mjwt.CustomClaim, input dto.ViolationRequest) (*string, resterr.APIError) {
@@ -37,7 +45,7 @@ func (v *ViolationService) InsertViolation(user mjwt.CustomClaim, input dto.Viol
 
 	// validasi inputan state,
 	state := input.State
-	// jika bukan 0 draft atau 1 perlu persetujuan set ke draft
+	// jika bukan 0 draft atau 1 set ke draft
 	if !(state == enum.StDraft || state == enum.StNeedApprove) {
 		state = enum.StDraft
 	}
@@ -209,12 +217,33 @@ func (v *ViolationService) SendToConfirmationViolation(user mjwt.CustomClaim, vi
 	}
 
 	// DB
-	violationDrafted, err := v.vDao.ChangeStateViolation(data)
+	violationReady, err := v.vDao.ChangeStateViolation(data)
 	if err != nil {
 		return nil, err
 	}
 
-	return violationDrafted, nil
+	go func() {
+		users, err := v.uDao.FindUserHSSE(user.Branch)
+		if err != nil {
+			logger.Error("mendapatkan user gagal saat menambahkan fcm (SendToConfirmationViolation)", err)
+		}
+
+		var tokens []string
+		for _, u := range users {
+			if u.ID != user.Identity {
+				tokens = append(tokens, u.FcmToken)
+			}
+		}
+
+		// firebase
+		v.fcm.SendMessage(fcm.Payload{
+			Title:          "Dokumen memerlukan persetujuan",
+			Message:        fmt.Sprintf("Truck dengan no lambung %s melakukan pelanggaran", violationReady.NoIdentity),
+			ReceiverTokens: tokens,
+		})
+	}()
+
+	return violationReady, nil
 }
 
 func (v *ViolationService) ApproveViolation(user mjwt.CustomClaim, violationID string) (*dto.Violation, resterr.APIError) {

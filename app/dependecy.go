@@ -1,6 +1,7 @@
 package app
 
 import (
+	"tilank/clients/fcm"
 	"tilank/dao/jptdao"
 	"tilank/dao/rulesdao"
 	"tilank/dao/truckdao"
@@ -24,10 +25,13 @@ var (
 	truckDao     = truckdao.NewTruckDao()
 	rulesDao     = rulesdao.NewRulesDao()
 
+	// api client
+	fcmClient = fcm.NewFcmClient()
+
 	// Service
 	userService      = service.NewUserService(userDao, cryptoUtils, jwt)
 	jptService       = service.NewJptService(jptDao)
-	violationService = service.NewViolationService(violationDao, truckDao, rulesDao)
+	violationService = service.NewViolationService(violationDao, truckDao, rulesDao, userDao, fcmClient)
 	truckService     = service.NewTruckService(truckDao)
 	rulesService     = service.NewRulesService(rulesDao)
 

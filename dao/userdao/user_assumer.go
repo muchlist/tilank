@@ -15,6 +15,7 @@ type UserDaoAssumer interface {
 
 	GetUserByID(userID string) (*dto.UserResponse, resterr.APIError)
 	GetUserByIDWithPassword(userID string) (*dto.User, resterr.APIError)
-	FindUser() (dto.UserResponseList, resterr.APIError)
+	FindUser(branch string) (dto.UserResponseList, resterr.APIError)
+	FindUserHSSE(branch string) (dto.UserResponseList, resterr.APIError)
 	CheckIDAvailable(email string) (bool, resterr.APIError)
 }

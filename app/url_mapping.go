@@ -8,6 +8,7 @@ import (
 	"tilank/middleware"
 )
 
+//nolint:funlen
 func mapUrls(app *fiber.App) {
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Config{

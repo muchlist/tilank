@@ -2,9 +2,9 @@ package fcm
 
 import (
 	"context"
+	"errors"
 	firebase "firebase.google.com/go/v4"
 	"google.golang.org/api/option"
-	"log"
 	"os"
 	"tilank/utils/logger"
 )
@@ -14,6 +14,7 @@ const (
 )
 
 var (
+	// FCM pointer to use fcm cloud message
 	FCM     *firebase.App
 	fcmCred string
 )
@@ -22,7 +23,7 @@ var (
 // responsenya digunakan untuk memutus koneksi apabila main program dihentikan
 func Init() error {
 	if os.Getenv(firebaseCred) == "" {
-		log.Fatal("firebase credensial tidak boleh kosong ENV: GOOGLE_APPLICATION_CREDENTIALS")
+		logger.Error("firebase credensial tidak boleh kosong ENV: GOOGLE_APPLICATION_CREDENTIALS", errors.New("environment variable"))
 	}
 	fcmCred = os.Getenv(firebaseCred)
 	opt := option.WithCredentialsFile(fcmCred)
@@ -34,5 +35,6 @@ func Init() error {
 	}
 	FCM = fcm
 
+	logger.Info("FCM terkoneksi")
 	return nil
 }
