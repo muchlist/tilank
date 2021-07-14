@@ -299,7 +299,7 @@ func (u *userDao) GetUserByIDWithPassword(userID string) (*dto.User, resterr.API
 }
 
 // FindUser mendapatkan daftar semua user dari database
-func (u *userDao) FindUser(branch string) (dto.UserResponseList, resterr.APIError) {
+func (u *userDao) FindUser() (dto.UserResponseList, resterr.APIError) {
 	coll := db.DB.Collection(keyUserColl)
 	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
 	defer cancel()
@@ -307,7 +307,7 @@ func (u *userDao) FindUser(branch string) (dto.UserResponseList, resterr.APIErro
 	users := dto.UserResponseList{}
 	opts := options.Find()
 	opts.SetSort(bson.D{{keyUserID, -1}}) //nolint:govet
-	sortCursor, err := coll.Find(ctx, bson.M{keyUserBranch: strings.ToUpper(branch)}, opts)
+	sortCursor, err := coll.Find(ctx, bson.M{}, opts)
 	if err != nil {
 		logger.Error("Gagal mendapatkan user dari database", err)
 		apiErr := resterr.NewInternalServerError("Database error", err)
