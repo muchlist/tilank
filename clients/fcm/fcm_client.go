@@ -4,6 +4,7 @@ import (
 	"context"
 	"firebase.google.com/go/v4/messaging"
 	"tilank/utils/logger"
+	"tilank/utils/sfunc"
 )
 
 func NewFcmClient() ClientAssumer {
@@ -50,7 +51,7 @@ func (u *fcmClient) SendMessage(payload Payload) {
 			Title: payload.Title,
 			Body:  payload.Message,
 		},
-		Tokens: validTokens,
+		Tokens: sfunc.Unique(validTokens),
 	}
 
 	_, err = client.SendMulticast(context.Background(), message)
