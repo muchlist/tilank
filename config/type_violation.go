@@ -2,6 +2,7 @@ package config
 
 const (
 	TypeAPD        = "APD"
+	TypeSign       = "RAMBU-RAMBU"
 	TypeProccedure = "PROSEDUR"
 	TypeCrime      = "PRILAKU"
 	TypeBehavior   = "KRIMINAL"
@@ -9,5 +10,5 @@ const (
 )
 
 func GetTypeAvailable() []string {
-	return []string{TypeAPD, TypeProccedure, TypeCrime, TypeBehavior, TypeOther}
+	return []string{TypeAPD, TypeSign, TypeProccedure, TypeCrime, TypeBehavior, TypeOther}
 }

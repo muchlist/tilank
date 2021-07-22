@@ -3,6 +3,7 @@ package config
 const (
 	HintApd    = "Sopir tidak menggunakan APD"
 	HintOut    = "Sopir turun dari armada"
+	HintSign   = "Sopir melanggar rambu-rambu / marka jalan"
 	HintKernet = "Membawa kernet atau tumpangan orang"
 	HintPark   = "Parkir tidak pada tempatnya"
 	HintTrapic = "Melawan arus lalu lintas"
@@ -17,6 +18,7 @@ const (
 func GetHintAvailable() []string {
 	return []string{
 		HintApd,
+		HintSign,
 		HintOut,
 		HintKernet,
 		HintPark,
